@@ -1,5 +1,7 @@
 # Changelog
 
+## [v1.74.0](https://github.com/kromiii/tbls/commits/v1.74.0) - 2024-04-27
+
 ## [v1.74.0](https://github.com/k1LoW/tbls/compare/v1.73.3...v1.74.0) - 2024-04-13
 ### Other Changes
 - chore(deps): bump the dependencies group with 5 updates by @dependabot in https://github.com/k1LoW/tbls/pull/568
