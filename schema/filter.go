@@ -6,7 +6,6 @@ import (
 
 	"github.com/k1LoW/errors"
 	"github.com/minio/pkg/wildcard"
-	"github.com/samber/lo"
 )
 
 type FilterOption struct {
@@ -71,29 +70,34 @@ func (s *Schema) SepareteTablesThatAreIncludedOrNot(opt *FilterOption) (_ []*Tab
 		}
 	}
 
-	includes2 := []*Table{}
+	includedMap := make(map[string]*Table)
 	for _, t := range includes {
-		includes2 = append(includes2, t)
+		includedMap[t.Name] = t
 		ts, _, err := t.CollectTablesAndRelations(opt.Distance, true)
 		if err != nil {
 			return nil, nil, err
 		}
 		for _, tt := range ts {
-			if !lo.ContainsBy(includes, func(t *Table) bool {
-				return tt.Name == t.Name
-			}) {
-				includes2 = append(includes2, tt)
+			if _, exists := includedMap[tt.Name]; !exists {
+				includedMap[tt.Name] = tt
 			}
 		}
 	}
 
-	excludes2 := []*Table{}
-	for _, t := range excludes {
-		if lo.ContainsBy(includes2, func(tt *Table) bool {
-			return tt.Name == t.Name
-		}) {
-			continue
+	includes2 := make([]*Table, 0, len(includedMap))
+	for _, t := range includedMap {
+		includes2 = append(includes2, t)
+	}
+
+	excludedMap := make(map[string]*Table)
+	for _, t := range s.Tables {
+		if _, included := includedMap[t.Name]; !included {
+			excludedMap[t.Name] = t
 		}
+	}
+
+	excludes2 := make([]*Table, 0, len(excludedMap))
+	for _, t := range excludedMap {
 		excludes2 = append(excludes2, t)
 	}
 
